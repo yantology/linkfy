@@ -1,6 +1,6 @@
 {
   "framework": "react",
-  "projectName": "tanstack-router-starter-template",
+  "projectName": "linkfy",
   "typescript": true,
   "tailwind": true,
   "packageManager": "bun",

@@ -11,7 +11,7 @@ export const Route = createRootRouteWithContext<{
 }>()({
   component: () => (
     <>
-      <Header />
+
 
       <Outlet />
       <TanStackRouterDevtools />
