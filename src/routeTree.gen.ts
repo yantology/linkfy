@@ -11,13 +11,21 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as UnauthImport } from './routes/_unauth'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthRegisterImport } from './routes/_auth/register'
-import { Route as AuthLoginImport } from './routes/_auth/login'
-import { Route as AuthForgotPasswordImport } from './routes/_auth/forgot-password'
+import { Route as UnauthRegisterImport } from './routes/_unauth/register'
+import { Route as UnauthLoginImport } from './routes/_unauth/login'
+import { Route as UnauthForgotPasswordImport } from './routes/_unauth/forgot-password'
+import { Route as AuthDashboardImport } from './routes/_auth/dashboard'
+import { Route as AuthEditUsernameImport } from './routes/_auth/edit.$username'
 
 // Create/Update Routes
+
+const UnauthRoute = UnauthImport.update({
+  id: '/_unauth',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AuthRoute = AuthImport.update({
   id: '/_auth',
@@ -30,21 +38,33 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthRegisterRoute = AuthRegisterImport.update({
+const UnauthRegisterRoute = UnauthRegisterImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => UnauthRoute,
 } as any)
 
-const AuthLoginRoute = AuthLoginImport.update({
+const UnauthLoginRoute = UnauthLoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => UnauthRoute,
+} as any)
+
+const UnauthForgotPasswordRoute = UnauthForgotPasswordImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => UnauthRoute,
+} as any)
+
+const AuthDashboardRoute = AuthDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
 
-const AuthForgotPasswordRoute = AuthForgotPasswordImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
+const AuthEditUsernameRoute = AuthEditUsernameImport.update({
+  id: '/edit/$username',
+  path: '/edit/$username',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -66,25 +86,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/_auth/forgot-password': {
-      id: '/_auth/forgot-password'
+    '/_unauth': {
+      id: '/_unauth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof UnauthImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/dashboard': {
+      id: '/_auth/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardImport
+      parentRoute: typeof AuthImport
+    }
+    '/_unauth/forgot-password': {
+      id: '/_unauth/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof UnauthForgotPasswordImport
+      parentRoute: typeof UnauthImport
     }
-    '/_auth/login': {
-      id: '/_auth/login'
+    '/_unauth/login': {
+      id: '/_unauth/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof UnauthLoginImport
+      parentRoute: typeof UnauthImport
     }
-    '/_auth/register': {
-      id: '/_auth/register'
+    '/_unauth/register': {
+      id: '/_unauth/register'
       path: '/register'
       fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterImport
+      preLoaderRoute: typeof UnauthRegisterImport
+      parentRoute: typeof UnauthImport
+    }
+    '/_auth/edit/$username': {
+      id: '/_auth/edit/$username'
+      path: '/edit/$username'
+      fullPath: '/edit/$username'
+      preLoaderRoute: typeof AuthEditUsernameImport
       parentRoute: typeof AuthImport
     }
   }
@@ -93,67 +134,106 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthRouteChildren {
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthEditUsernameRoute: typeof AuthEditUsernameRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-  AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
+  AuthDashboardRoute: AuthDashboardRoute,
+  AuthEditUsernameRoute: AuthEditUsernameRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface UnauthRouteChildren {
+  UnauthForgotPasswordRoute: typeof UnauthForgotPasswordRoute
+  UnauthLoginRoute: typeof UnauthLoginRoute
+  UnauthRegisterRoute: typeof UnauthRegisterRoute
+}
+
+const UnauthRouteChildren: UnauthRouteChildren = {
+  UnauthForgotPasswordRoute: UnauthForgotPasswordRoute,
+  UnauthLoginRoute: UnauthLoginRoute,
+  UnauthRegisterRoute: UnauthRegisterRoute,
+}
+
+const UnauthRouteWithChildren =
+  UnauthRoute._addFileChildren(UnauthRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof AuthRouteWithChildren
-  '/forgot-password': typeof AuthForgotPasswordRoute
-  '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
+  '': typeof UnauthRouteWithChildren
+  '/dashboard': typeof AuthDashboardRoute
+  '/forgot-password': typeof UnauthForgotPasswordRoute
+  '/login': typeof UnauthLoginRoute
+  '/register': typeof UnauthRegisterRoute
+  '/edit/$username': typeof AuthEditUsernameRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof AuthRouteWithChildren
-  '/forgot-password': typeof AuthForgotPasswordRoute
-  '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
+  '': typeof UnauthRouteWithChildren
+  '/dashboard': typeof AuthDashboardRoute
+  '/forgot-password': typeof UnauthForgotPasswordRoute
+  '/login': typeof UnauthLoginRoute
+  '/register': typeof UnauthRegisterRoute
+  '/edit/$username': typeof AuthEditUsernameRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
-  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
+  '/_unauth': typeof UnauthRouteWithChildren
+  '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_unauth/forgot-password': typeof UnauthForgotPasswordRoute
+  '/_unauth/login': typeof UnauthLoginRoute
+  '/_unauth/register': typeof UnauthRegisterRoute
+  '/_auth/edit/$username': typeof AuthEditUsernameRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/forgot-password' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | ''
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/edit/$username'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/forgot-password' | '/login' | '/register'
+  to:
+    | '/'
+    | ''
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/edit/$username'
   id:
     | '__root__'
     | '/'
     | '/_auth'
-    | '/_auth/forgot-password'
-    | '/_auth/login'
-    | '/_auth/register'
+    | '/_unauth'
+    | '/_auth/dashboard'
+    | '/_unauth/forgot-password'
+    | '/_unauth/login'
+    | '/_unauth/register'
+    | '/_auth/edit/$username'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
+  UnauthRoute: typeof UnauthRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
+  UnauthRoute: UnauthRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -167,7 +247,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_auth"
+        "/_auth",
+        "/_unauth"
       ]
     },
     "/": {
@@ -176,21 +257,36 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/forgot-password",
-        "/_auth/login",
-        "/_auth/register"
+        "/_auth/dashboard",
+        "/_auth/edit/$username"
       ]
     },
-    "/_auth/forgot-password": {
-      "filePath": "_auth/forgot-password.tsx",
+    "/_unauth": {
+      "filePath": "_unauth.tsx",
+      "children": [
+        "/_unauth/forgot-password",
+        "/_unauth/login",
+        "/_unauth/register"
+      ]
+    },
+    "/_auth/dashboard": {
+      "filePath": "_auth/dashboard.tsx",
       "parent": "/_auth"
     },
-    "/_auth/login": {
-      "filePath": "_auth/login.tsx",
-      "parent": "/_auth"
+    "/_unauth/forgot-password": {
+      "filePath": "_unauth/forgot-password.tsx",
+      "parent": "/_unauth"
     },
-    "/_auth/register": {
-      "filePath": "_auth/register.tsx",
+    "/_unauth/login": {
+      "filePath": "_unauth/login.tsx",
+      "parent": "/_unauth"
+    },
+    "/_unauth/register": {
+      "filePath": "_unauth/register.tsx",
+      "parent": "/_unauth"
+    },
+    "/_auth/edit/$username": {
+      "filePath": "_auth/edit.$username.tsx",
       "parent": "/_auth"
     }
   }
