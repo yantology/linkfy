@@ -23,7 +23,6 @@ export const CreateLinkfySchema = z.object({
   avatar_url: z.string().url().optional(),
   name: z.string().max(50).optional(),
   bio: z.string().max(500).optional(),
-  message: z.string().optional(),
 });
 
 export const UpdateLinkfySchema = z.object({
@@ -177,7 +176,10 @@ export const checkUsername = async (request: CheckUsernameRequest): Promise<Mess
   } catch (error) {
     if (error instanceof ZodError) {
       console.error('Validation error:', error.errors);
-      throw new Error('Invalid username format');
+      const formattedErrors = error.errors.map(err => 
+        `${err.path.join('.')}: ${err.message}`
+      ).join('; ');
+      throw new Error(`Data validation failed: ${formattedErrors}`);
     }
     throw error;
   }
